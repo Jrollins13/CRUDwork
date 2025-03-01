@@ -52,6 +52,12 @@ class _TaskListScreenState extends State<TaskListScreen> {
     });
   }
 
+  void _editTask(int index) {
+    setState(() {
+      _tasks[index].name = _taskController.text;
+    });
+  }
+
   void _deleteTask(int index) {
     setState(() {
       _tasks.removeAt(index);
@@ -60,6 +66,18 @@ class _TaskListScreenState extends State<TaskListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Dialog editDialog = Dialog(
+      child: Container(
+        height: 250.0,
+        width: 600.0,
+        color: Colors.white,
+        child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+            
+          ],
+        ),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -94,9 +112,22 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     onChanged: (_) => _toggleTask(index),
                   ),
                   title: Text(_tasks[index].name),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteTask(index),
+                  trailing: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) => editDialog,
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _deleteTask(index),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -105,5 +136,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _taskController.dispose();
+    super.dispose();
   }
 }
