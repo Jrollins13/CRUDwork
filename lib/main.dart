@@ -53,9 +53,35 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   void _editTask(int index) {
-    setState(() {
-      _tasks[index].name = _taskController.text;
-    });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Task'),
+          content: TextField(
+            controller: _taskController,
+            decoration: const InputDecoration(hintText: 'Enter new task name'),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _tasks[index].name = _taskController.text;
+                  _taskController.clear();
+                });
+              },
+              child: const Text('Save'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _deleteTask(int index) {
@@ -66,18 +92,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Dialog editDialog = Dialog(
-      child: Container(
-        height: 250.0,
-        width: 600.0,
-        color: Colors.white,
-        child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-            
-          ],
-        ),
-      ),
-    );
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -116,12 +130,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) => editDialog,
-                          );
-                        },
+                        onPressed: () => _editTask(index),
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
