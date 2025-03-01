@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
       title: 'Task Manager',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
       ),
       home: const TaskListScreen(),
     );
@@ -23,16 +22,9 @@ class MyApp extends StatelessWidget {
 class Task {
   String name;
   bool isCompleted;
-  Priority priority;
 
-  Task({
-    required this.name, 
-    this.isCompleted = false, 
-    this.priority = Priority.medium
-  });
+  Task({required this.name, this.isCompleted = false});
 }
-
-enum Priority { low, medium, high }
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
@@ -44,19 +36,14 @@ class TaskListScreen extends StatefulWidget {
 class _TaskListScreenState extends State<TaskListScreen> {
   final List<Task> _tasks = [];
   final TextEditingController _taskController = TextEditingController();
-  Priority _selectedPriority = Priority.medium;
 
   void _addTask() {
     if (_taskController.text.isEmpty) return;
-    
+
     setState(() {
-      _tasks.add(Task(
-        name: _taskController.text,
-        priority: _selectedPriority,
-      ));
+      _tasks.add(Task(name: _taskController.text));
       _taskController.clear();
     });
-    _sortTasks();
   }
 
   void _toggleTask(int index) {
@@ -71,12 +58,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
     });
   }
 
-  void _sortTasks() {
-    setState(() {
-      _tasks.sort((a, b) => b.priority.index.compareTo(a.priority.index));
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +68,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
                 Expanded(
@@ -95,32 +76,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     controller: _taskController,
                     decoration: const InputDecoration(
                       hintText: 'Enter task name',
-                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                DropdownButton<Priority>(
-                  value: _selectedPriority,
-                  items: Priority.values.map((priority) {
-                    return DropdownMenuItem(
-                      value: priority,
-                      child: Text(priority.name.toUpperCase()),
-                    );
-                  }).toList(),
-                  onChanged: (Priority? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedPriority = newValue;
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _addTask,
-                  child: const Text('Add'),
-                ),
+                const SizedBox(width: 20),
+                ElevatedButton(onPressed: _addTask, child: const Text('Add')),
               ],
             ),
           ),
@@ -134,7 +94,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                     onChanged: (_) => _toggleTask(index),
                   ),
                   title: Text(_tasks[index].name),
-                  subtitle: Text('Priority: ${_tasks[index].priority.name.toUpperCase()}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () => _deleteTask(index),
@@ -146,11 +105,5 @@ class _TaskListScreenState extends State<TaskListScreen> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _taskController.dispose();
-    super.dispose();
   }
 }
